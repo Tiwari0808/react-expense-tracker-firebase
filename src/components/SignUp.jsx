@@ -1,5 +1,14 @@
-import React, { useRef, useState } from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import React, { useContext, useRef, useState } from "react";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Spinner,
+} from "react-bootstrap";
+import { AuthContext } from "../Contexts/Auth-Context";
 
 const SignUp = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -10,32 +19,62 @@ const SignUp = () => {
   const passwordInputRef = useRef();
   const confirmPasswordRef = useRef();
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const { login } = useContext(AuthContext);
+
   const submitHandler = async (e) => {
     e.preventDefault();
+    setErrMsg(null);
+    setSuccessMsg(null);
     if (!isLogin) {
       if (passwordInputRef.current.value !== confirmPasswordRef.current.value) {
-        alert("password did not match");
+        setErrMsg("Password did not match");
         return;
       }
     }
+
+    setIsLoading(true);
+    let url;
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4";
     } else {
-      try {
-        const res = await fetch(
-          "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: emailInputRef.current.value,
-              password: passwordInputRef.current.value,
-              returnSecureToken: true,
-            }),
-          }
-        );
-        const data = await res.json();
-        console.log('login successful',data); 
-      } catch (error) {console.log(error);
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4";
+    }
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: emailInputRef.current.value,
+          password: passwordInputRef.current.value,
+          returnSecureToken: true,
+        }),
+      });
+      setIsLoading(false);
+      const data = await res.json();
+      login(data.idToken);
+
+      if (!res.ok) {
+        setErrMsg(data.error.message || "Error Occured");
+      } else {
+        setSuccessMsg(isLogin ? "Login Successful!" : "Sign Up Successful!");
+        emailInputRef.current.value = "";
+        passwordInputRef.current.value = "";
+        if (!isLogin) {
+          confirmPasswordRef.current.value = "";
+        }
+
+        if (!isLogin) {
+          setIsLogin(true);
+          setSuccessMsg((prev) => prev + " Login Now");
+        }
       }
+    } catch (error) {
+      setIsLoading(false);
+      setErrMsg("Something Went Wrong");
     }
   };
 
@@ -46,6 +85,8 @@ const SignUp = () => {
           <Card>
             <Card.Body>
               <Card.Title>{isLogin ? "Login" : "Sign Up"}</Card.Title>
+              {errMsg && <p className="text-danger">{errMsg}</p>}
+              {successMsg && <p className="text-success">{successMsg}</p>}
               <Form onSubmit={submitHandler}>
                 <Form.Group controlId="emailInput">
                   <Form.Label>Email</Form.Label>
@@ -73,9 +114,12 @@ const SignUp = () => {
                       required></Form.Control>
                   </Form.Group>
                 )}
-                <Button className="mt-3" type="submit">
-                  {isLogin ? "Login" : "Sign Up"}
-                </Button>
+                {!isLoading && (
+                  <Button className="mt-3" type="submit">
+                    {isLogin ? "Login" : "Sign Up"}
+                  </Button>
+                )}
+                {isLoading && <Spinner animation="grow"></Spinner>}
               </Form>
             </Card.Body>
           </Card>

@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Container, Nav, Navbar } from 'react-bootstrap'
+import { AuthContext } from '../Contexts/Auth-Context'
 
 const MainNavbar = () => {
+   const {isLoggedIn} = useContext(AuthContext)
   return (
     <Navbar expand="lg">
         <Container>
@@ -9,9 +11,9 @@ const MainNavbar = () => {
             <Navbar.Toggle aria-controls='main-navbar'/>
             <Navbar.Collapse id='main-navbar'>
                 <Nav>
-                    <Nav.Link>Home</Nav.Link>
-                    <Nav.Link>Login</Nav.Link>
-                    <Nav.Link>About</Nav.Link>
+                    {isLoggedIn&&<Nav.Link>Home</Nav.Link>}
+                    <Nav.Link>{isLoggedIn?'Logout':'Login'}</Nav.Link>
+                    {isLoggedIn&&<Nav.Link>About</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Container>
