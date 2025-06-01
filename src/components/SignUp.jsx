@@ -9,8 +9,10 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { AuthContext } from "../Contexts/Auth-Context";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
   const isLoginHandler = () => {
     setIsLogin(!isLogin);
@@ -55,11 +57,13 @@ const SignUp = () => {
       });
       setIsLoading(false);
       const data = await res.json();
-      login(data.idToken);
 
       if (!res.ok) {
         setErrMsg(data.error.message || "Error Occured");
+        return;
       } else {
+        login(data.idToken);
+        navigate("/");
         setSuccessMsg(isLogin ? "Login Successful!" : "Sign Up Successful!");
         emailInputRef.current.value = "";
         passwordInputRef.current.value = "";
