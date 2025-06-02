@@ -1,12 +1,41 @@
-# React + Vite
+# 💸 React Expense Tracker with Firebase Authentication
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully functional **Expense Tracker** application built using **React** and **Firebase**. It allows users to sign up, log in, manage their expenses, update profile details, and verify email addresses — all while keeping the UI clean and responsive with **React Bootstrap**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- 🔐 User Authentication (Firebase)
+- 🧾 Add, view, and manage expenses
+- 👤 Profile update (display name & profile photo)
+- 📧 Email verification
+- 📦 Persisted authentication state using `localStorage`
+- 🎨 Styled with React Bootstrap
+- 📂 Clean project structure with modular components
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🔧 Tech Stack
+
+- **Frontend**: React, React Bootstrap
+- **Backend**: Firebase Authentication (REST API)
+- **State Management**: React Context API
+- **HTTP Requests**: Axios & Fetch API
+
+---
+
+## 📸 Screenshots
+
+Coming soon...
+
+---
+
+## 🛠️ Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/react-expense-tracker-firebase.git
+cd react-expense-tracker-firebase
+
