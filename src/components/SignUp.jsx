@@ -124,6 +124,8 @@ const SignUp = () => {
                   </Button>
                 )}
                 {isLoading && <Spinner animation="grow"></Spinner>}
+                <br></br>
+                {isLogin && <a onClick={()=>navigate('/forgotPassword')} className="mt-2">Forgot Password?</a>}
               </Form>
             </Card.Body>
           </Card>
