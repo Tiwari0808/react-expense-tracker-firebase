@@ -2,15 +2,13 @@ import { useRef, useContext, useState, useEffect } from "react";
 import { Button, Card, Container, Form } from "react-bootstrap";
 import { AuthContext } from "../Contexts/Auth-Context";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const nameInputRef = useRef();
   const photoInputRef = useRef();
   const { token, verifyEmail } = useContext(AuthContext);
   const [emailVerified, setEmailVerified] = useState(false);
-
-  const [errMsg, setErrMsg] = useState(null);
-  const [successMsg, setSuccessMsg] = useState(null);
 
   useEffect(() => {
     const fetchdata = async () => {
@@ -27,8 +25,9 @@ const ProfilePage = () => {
           if (user.displayName) nameInputRef.current.value = user.displayName;
           if (user.photoUrl) photoInputRef.current.value = user.photoUrl;
           setEmailVerified(user.emailVerified);
+          toast.success('Previous Data fetched Successfully')
         } else {
-          alert("Could not fetch profile data");
+         toast.error('Could not fetch profile data');
         }
       } catch (error) {
         console.error("Error fetching Profie", error.message);
@@ -62,9 +61,10 @@ const ProfilePage = () => {
 
     const data = await response.json();
     if (response.ok) {
-      setSuccessMsg("Profile updated successfully!");
+      toast.success('Profile updated successfully!')
     } else {
-      setErrMsg(data.error.message || "Update failed");
+      let errMsg = data.error.message ;
+      toast.success(errMsg || 'Error submitting data');
     }
   };
 
@@ -73,8 +73,6 @@ const ProfilePage = () => {
       <Card>
         <Card.Body>
           <Card.Title>Complete Your Profile</Card.Title>
-          <p className="my-2 text-danger">{errMsg}</p>
-          <p className="my-2 text-success">{successMsg}</p>
           <Form onSubmit={submitHandler}>
             <Form.Group>
               <Form.Label>Full Name</Form.Label>
