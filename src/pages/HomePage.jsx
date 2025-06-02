@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Button,
@@ -8,6 +9,10 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
+import { toast } from "react-toastify";
+
+const URL =
+  "https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses.json";
 
 const HomePage = () => {
   const [amount, setAmount] = useState("");
@@ -15,18 +20,43 @@ const HomePage = () => {
   const [category, setCategory] = useState("Food");
   const [expenses, setExpenses] = useState([]);
 
-  const submitHandler = (e) => {
+  useEffect(() => {
+    const getExpenses = async()=>{
+      try {
+        const res = await axios.get(URL);
+        const data = res.data;
+        const loadedExpenses = [];
+        for(let key in data){
+         loadedExpenses.push({id:key,...data[key]});
+        }
+        setExpenses(loadedExpenses);
+      } catch (error) {
+        
+      }
+
+    }
+    getExpenses()
+  }, []);
+
+  const submitHandler = async (e) => {
     e.preventDefault();
     const newExpense = {
-      id: Math.random().toString(),
       amount,
       description,
       category,
     };
-    setExpenses((prev) => [...prev, newExpense]);
-    setAmount("");
-    setDescription("");
-    setCategory("Food");
+    try {
+      const res = await axios.post(URL, newExpense);
+      if (res.status === 200) {
+        toast.success("Expense added successfully");
+        setExpenses((prev) => [...prev, newExpense]);
+        setAmount("");
+        setDescription("");
+        setCategory("Food");
+      }
+    } catch (error) {
+      toast.error("Failed to save Expense");
+    }
   };
 
   return (
@@ -71,22 +101,21 @@ const HomePage = () => {
 
               <Button type="submit">Add Expense</Button>
             </Form>
-
           </Card>
         </Col>
         <Col lg={6}>
-        <h5 className="mt-4">Expenses</h5>
-            {expenses.length === 0 ? (
-              <p>No expenses added yet.</p>
-            ) : (
-              <ListGroup>
-                {expenses.map((exp) => (
-                  <ListGroup.Item key={exp.id}>
-                    ₹{exp.amount} - {exp.description} ({exp.category})
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            )}
+          <h5 className="mt-4">Expenses</h5>
+          {expenses.length === 0 ? (
+            <p>No expenses added yet.</p>
+          ) : (
+            <ListGroup>
+              {expenses.map((exp) => (
+                <ListGroup.Item key={exp.id}>
+                  ₹{exp.amount} - {exp.description} ({exp.category})
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          )}
         </Col>
       </Row>
     </Container>
