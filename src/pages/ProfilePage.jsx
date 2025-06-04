@@ -3,11 +3,14 @@ import { Button, Card, Container, Form } from "react-bootstrap";
 import { AuthContext } from "../Contexts/Auth-Context";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
   const nameInputRef = useRef();
   const photoInputRef = useRef();
-  const { token, verifyEmail } = useContext(AuthContext);
+  const { verifyEmail } = useContext(AuthContext);
+  const token = useSelector(state=>state.auth.token);
+
   const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {

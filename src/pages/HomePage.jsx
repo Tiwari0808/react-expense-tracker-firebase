@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Form,
   Button,
@@ -10,23 +10,24 @@ import {
   Col,
 } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const URL =
   "https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses.json";
 
 const HomePage = () => {
-  // Controlled inputs for form fields
+  const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState("Food");
 
   const [expenses, setExpenses] = useState([]);
 
-  // Edit mode state
+
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  // Fetch expenses on mount
+
   useEffect(() => {
     const getExpenses = async () => {
       try {
@@ -41,10 +42,10 @@ const HomePage = () => {
         toast.error("Failed to load expenses");
       }
     };
-    getExpenses();
+    {isLoggedIn ? getExpenses():toast.error('Please Login')}
   }, []);
 
-  // Handler to populate form fields for editing
+
   const editHandler = (expense) => {
     setIsEditing(true);
     setEditId(expense.id);
@@ -53,7 +54,7 @@ const HomePage = () => {
     setCategory(expense.category);
   };
 
-  // Submit handler to add or update expense
+
   const submitHandler = async (e) => {
     e.preventDefault();
 
@@ -65,7 +66,7 @@ const HomePage = () => {
 
     try {
       if (isEditing) {
-        // Update existing expense
+     
         const res = await axios.put(
           `https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses/${editId}.json`,
           expenseData
@@ -82,7 +83,7 @@ const HomePage = () => {
           setEditId(null);
         }
       } else {
-        // Add new expense
+       
         const res = await axios.post(URL, expenseData);
         if (res.status === 200) {
           const id = res.data.name; // Firebase returns the new id here
@@ -91,7 +92,7 @@ const HomePage = () => {
         }
       }
 
-      // Reset form fields after add/update
+ 
       setAmount('');
       setDescription('');
       setCategory('Food');
@@ -100,7 +101,7 @@ const HomePage = () => {
     }
   };
 
-  // Delete handler remains unchanged
+ 
   const deleteHandler = async (id) => {
     try {
       const res = await axios.delete(

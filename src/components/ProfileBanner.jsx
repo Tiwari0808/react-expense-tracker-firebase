@@ -1,4 +1,3 @@
-import React from 'react'
 import { Alert, Button, Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 

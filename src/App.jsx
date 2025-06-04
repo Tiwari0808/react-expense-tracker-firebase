@@ -1,19 +1,20 @@
-import React, { useContext, useState } from 'react'
+import { useState } from 'react'
 import SignUp from './components/SignUp'
 import MainNavbar from './components/MainNavbar'
 import ProfileBanner from './components/ProfileBanner'
-import { Route, Router, Routes } from 'react-router-dom'
+import { Route,Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
-import { AuthContext } from './Contexts/Auth-Context'
 import AboutPage from './pages/AboutPage'
 import ErrorPage from './pages/ErrorPage'
 import ForgotPassword from './pages/ForgotPassword'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useSelector } from 'react-redux'
 
 const App = () => {
-  const {isLoggedIn} = useContext(AuthContext);
+ const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
+
   return (
     <>
     <MainNavbar/>

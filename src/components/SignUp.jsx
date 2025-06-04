@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -8,10 +8,13 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { AuthContext } from "../Contexts/Auth-Context";
+
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { authActions } from "../store/authSlice";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
   const isLoginHandler = () => {
@@ -24,7 +27,7 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-  const { login } = useContext(AuthContext);
+ 
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -62,7 +65,7 @@ const SignUp = () => {
         setErrMsg(data.error.message || "Error Occured");
         return;
       } else {
-        login(data.idToken);
+        dispatch(authActions.login(data.idToken));
         navigate("/");
         setSuccessMsg(isLogin ? "Login Successful!" : "Sign Up Successful!");
         emailInputRef.current.value = "";
@@ -125,7 +128,13 @@ const SignUp = () => {
                 )}
                 {isLoading && <Spinner animation="grow"></Spinner>}
                 <br></br>
-                {isLogin && <a onClick={()=>navigate('/forgotPassword')} className="mt-2">Forgot Password?</a>}
+                {isLogin && (
+                  <a
+                    onClick={() => navigate("/forgotPassword")}
+                    className="mt-2">
+                    Forgot Password?
+                  </a>
+                )}
               </Form>
             </Card.Body>
           </Card>

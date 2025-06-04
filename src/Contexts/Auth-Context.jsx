@@ -1,20 +1,11 @@
 import axios from "axios";
 import { createContext, useState } from "react";
+import { useSelector } from "react-redux";
 
 export const AuthContext = createContext();
 
 const AuthContextProvider = ({ children }) => {
-  const storedToken = localStorage.getItem("token");
-  const [token, setToken] = useState(storedToken || null);
-  const isLoggedIn = !!token;
-  const login = (id) => {
-    setToken(id);
-    localStorage.setItem("token", id);
-  };
-  const logout = () => {
-    setToken(null);
-    localStorage.removeItem("token");
-  };
+  const token = useSelector((state) => state.auth.token);
 
   const verifyEmail = async () => {
     try {
@@ -37,7 +28,7 @@ const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, isLoggedIn, login, logout, verifyEmail }}>
+      value={{verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );
