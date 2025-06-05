@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import SignUp from './components/SignUp'
 import MainNavbar from './components/MainNavbar'
 import ProfileBanner from './components/ProfileBanner'

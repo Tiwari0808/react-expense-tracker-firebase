@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   Button,
@@ -10,23 +10,23 @@ import {
   Col,
 } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { expenseActions } from "../store/expenseSlice";
 
 const URL =
   "https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses.json";
 
 const HomePage = () => {
-  const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
+  const expenses = useSelector((state) => state.expenses.expenses);
+  const dispatch = useDispatch();
+  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
-
-  const [expenses, setExpenses] = useState([]);
-
 
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
-
 
   useEffect(() => {
     const getExpenses = async () => {
@@ -37,14 +37,18 @@ const HomePage = () => {
         for (let key in data) {
           loadedExpenses.push({ id: key, ...data[key] });
         }
-        setExpenses(loadedExpenses);
+        dispatch(expenseActions.setExpenses(loadedExpenses));
       } catch (error) {
         toast.error("Failed to load expenses");
       }
     };
-    {isLoggedIn ? getExpenses():toast.error('Please Login')}
-  }, []);
-
+    // if (isLoggedIn) {
+    //   getExpenses();
+    // } else {
+    //   toast.error("Please Login");
+    // }
+    
+  }, [isLoggedIn, dispatch]);
 
   const editHandler = (expense) => {
     setIsEditing(true);
@@ -53,7 +57,6 @@ const HomePage = () => {
     setDescription(expense.description);
     setCategory(expense.category);
   };
-
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -66,7 +69,6 @@ const HomePage = () => {
 
     try {
       if (isEditing) {
-     
         const res = await axios.put(
           `https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses/${editId}.json`,
           expenseData
@@ -74,34 +76,37 @@ const HomePage = () => {
 
         if (res.status === 200) {
           toast.success("Expense updated successfully");
-          setExpenses((prev) =>
-            prev.map((exp) =>
-              exp.id === editId ? { id: editId, ...expenseData } : exp
-            )
+          dispatch(
+            expenseActions.updateExpense({ id: editId, ...expenseData })
           );
+          // setExpenses((prev) =>
+          //   prev.map((exp) =>
+          //     exp.id === editId ? { id: editId, ...expenseData } : exp
+          //   )
+          // );
           setIsEditing(false);
           setEditId(null);
         }
       } else {
-       
         const res = await axios.post(URL, expenseData);
         if (res.status === 200) {
           const id = res.data.name; // Firebase returns the new id here
           toast.success("Expense added successfully");
-          setExpenses((prev) => [...prev, { id, ...expenseData }]);
+          dispatch(
+            expenseActions.addExpense({ id: res.data.name, ...expenseData })
+          );
+          // setExpenses((prev) => [...prev, { id, ...expenseData }]);
         }
       }
 
- 
-      setAmount('');
-      setDescription('');
-      setCategory('Food');
+      setAmount("");
+      setDescription("");
+      setCategory("Food");
     } catch (error) {
       toast.error("Failed to save Expense");
     }
   };
 
- 
   const deleteHandler = async (id) => {
     try {
       const res = await axios.delete(
@@ -109,7 +114,8 @@ const HomePage = () => {
       );
       if (res.status === 200) {
         toast.success("Expense deleted Successfully");
-        setExpenses((prev) => prev.filter((item) => item.id !== id));
+        dispatch(expenseActions.deleteExpense(id));
+        // setExpenses((prev) => prev.filter((item) => item.id !== id));
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -118,6 +124,11 @@ const HomePage = () => {
 
   return (
     <Container>
+      {isPremium && (
+        <Button variant="success" className="mb-3">
+          Activate Premium
+        </Button>
+      )}
       <Row>
         <Col lg={4}>
           <Card className="p-3 mt-4">
@@ -147,8 +158,7 @@ const HomePage = () => {
                 <Form.Label>Category</Form.Label>
                 <Form.Select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
+                  onChange={(e) => setCategory(e.target.value)}>
                   <option>Food</option>
                   <option>Petrol</option>
                   <option>Salary</option>
@@ -167,11 +177,10 @@ const HomePage = () => {
                   onClick={() => {
                     setIsEditing(false);
                     setEditId(null);
-                    setAmount('');
-                    setDescription('');
-                    setCategory('Food');
-                  }}
-                >
+                    setAmount("");
+                    setDescription("");
+                    setCategory("Food");
+                  }}>
                   Cancel Edit
                 </Button>
               )}
@@ -191,14 +200,12 @@ const HomePage = () => {
                   <Button
                     variant="outline-warning"
                     className="mx-2"
-                    onClick={() => editHandler(exp)}
-                  >
+                    onClick={() => editHandler(exp)}>
                     Edit
                   </Button>
                   <Button
                     variant="outline-danger"
-                    onClick={() => deleteHandler(exp.id)}
-                  >
+                    onClick={() => deleteHandler(exp.id)}>
                     Delete
                   </Button>
                 </ListGroup.Item>
@@ -212,4 +219,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
- 

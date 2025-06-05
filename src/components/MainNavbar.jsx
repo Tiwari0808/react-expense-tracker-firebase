@@ -6,6 +6,7 @@ import { authActions } from "../store/authSlice";
 const MainNavbar = () => {
   const dispatch = useDispatch()
   const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
+  const isPremium = useSelector(state => state.expenses.isPremium);
   const navigate = useNavigate()
   const logoutHandler = ()=>{
     dispatch(authActions.logout())
@@ -14,7 +15,7 @@ const MainNavbar = () => {
   return (
     <Navbar expand="lg">
       <Container>
-        <Navbar.Brand>Expense-Tracker</Navbar.Brand>
+        <Navbar.Brand>Expense-Tracker {isPremium && <span className="badge bg-success">Premium</span>}</Navbar.Brand>
         <Navbar.Toggle aria-controls="main-navbar" />
         <Navbar.Collapse id="main-navbar">
           <Nav>
