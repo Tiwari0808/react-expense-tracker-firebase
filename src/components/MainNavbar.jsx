@@ -8,14 +8,16 @@ const MainNavbar = () => {
   const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
   const isPremium = useSelector(state => state.expenses.isPremium);
   const navigate = useNavigate()
+  const isPremiumActive = useSelector(state => state.expenses.isPremiumActive);
+   const isDarkTheme = useSelector(state => state.theme.isDarkTheme);
   const logoutHandler = ()=>{
     dispatch(authActions.logout())
     navigate('/signUp')
   }
   return (
-    <Navbar expand="lg">
+    <Navbar expand="lg"  className={isDarkTheme ? 'bg-dark navbar-dark' : 'bg-light navbar-light'}>
       <Container>
-        <Navbar.Brand>Expense-Tracker {isPremium && <span className="badge bg-success">Premium</span>}</Navbar.Brand>
+        <Navbar.Brand>Expense-Tracker {isPremiumActive && <span className="badge bg-success">Premium</span>}</Navbar.Brand>
         <Navbar.Toggle aria-controls="main-navbar" />
         <Navbar.Collapse id="main-navbar">
           <Nav>

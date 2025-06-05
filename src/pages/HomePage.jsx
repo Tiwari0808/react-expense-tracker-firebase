@@ -12,26 +12,52 @@ import {
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../store/expenseSlice";
+import './homepage.css'
+import ThemeToggle from '../components/ThemeToggle';
 
-const URL =
+const Firebase_url =
   "https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses.json";
 
 const HomePage = () => {
-  const expenses = useSelector((state) => state.expenses.expenses);
-  const dispatch = useDispatch();
-  const isPremium = useSelector((state) => state.expenses.isPremium);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
+  const expenses = useSelector((state) => state.expenses.expenses);
+  const dispatch = useDispatch();
+  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isPremiumActive = useSelector(state=>state.expenses.isPremiumActive)
+
+  const downloadExpensesCSV = () => {
+    const csvContent = [
+      'Amount,Description,Category,Date',
+      ...expenses.map(exp =>
+        `"${exp.amount}","${exp.description}","${exp.category}","${exp.date}"`
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'expenses.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const activatePremiumHandler = () => {
+    dispatch(expenseActions.activatePremium());
+    toast.success('Premium features activated!')
+  }
+
 
   useEffect(() => {
     const getExpenses = async () => {
       try {
-        const res = await axios.get(URL);
+        const res = await axios.get(Firebase_url);
         const data = res.data;
         const loadedExpenses = [];
         for (let key in data) {
@@ -42,12 +68,8 @@ const HomePage = () => {
         toast.error("Failed to load expenses");
       }
     };
-    // if (isLoggedIn) {
-    //   getExpenses();
-    // } else {
-    //   toast.error("Please Login");
-    // }
-    
+    getExpenses()
+
   }, [isLoggedIn, dispatch]);
 
   const editHandler = (expense) => {
@@ -79,23 +101,17 @@ const HomePage = () => {
           dispatch(
             expenseActions.updateExpense({ id: editId, ...expenseData })
           );
-          // setExpenses((prev) =>
-          //   prev.map((exp) =>
-          //     exp.id === editId ? { id: editId, ...expenseData } : exp
-          //   )
-          // );
           setIsEditing(false);
           setEditId(null);
         }
       } else {
-        const res = await axios.post(URL, expenseData);
+        const res = await axios.post(Firebase_url, expenseData);
         if (res.status === 200) {
           const id = res.data.name; // Firebase returns the new id here
           toast.success("Expense added successfully");
           dispatch(
             expenseActions.addExpense({ id: res.data.name, ...expenseData })
           );
-          // setExpenses((prev) => [...prev, { id, ...expenseData }]);
         }
       }
 
@@ -115,7 +131,6 @@ const HomePage = () => {
       if (res.status === 200) {
         toast.success("Expense deleted Successfully");
         dispatch(expenseActions.deleteExpense(id));
-        // setExpenses((prev) => prev.filter((item) => item.id !== id));
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -125,9 +140,20 @@ const HomePage = () => {
   return (
     <Container>
       {isPremium && (
-        <Button variant="success" className="mb-3">
-          Activate Premium
-        </Button>
+        <div className="premium-features mb-3">
+          <Button variant="success" onClick={activatePremiumHandler}>
+            Activate Premium
+          </Button>
+
+          {isPremiumActive && (
+            <div className="mt-2">
+              <ThemeToggle />
+              <Button variant="info" onClick={downloadExpensesCSV} className="ms-2">
+                Download Expenses
+              </Button>
+            </div>
+          )}
+        </div>
       )}
       <Row>
         <Col lg={4}>

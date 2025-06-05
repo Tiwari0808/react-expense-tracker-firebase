@@ -13,9 +13,10 @@ import { useSelector } from 'react-redux'
 
 const App = () => {
  const isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
+ const isDarkTheme = useSelector(state => state.theme.isDarkTheme);
 
   return (
-    <>
+    <div  className={isDarkTheme ? 'dark-theme' : 'light-theme'}>
     <MainNavbar/>
     {isLoggedIn && <ProfileBanner/>}
     <Routes>
@@ -27,7 +28,7 @@ const App = () => {
       <Route path='*' element={<ErrorPage/>}></Route>
     </Routes>
     <ToastContainer position="top-right" autoClose={3000}/>
-    </>
+    </div>
   )
 }
 
