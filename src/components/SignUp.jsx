@@ -16,7 +16,7 @@ import { authActions } from "../store/authSlice";
 const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const isLoginHandler = () => {
     setIsLogin(!isLogin);
   };
