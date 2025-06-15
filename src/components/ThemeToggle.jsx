@@ -4,7 +4,10 @@ import { Button } from 'react-bootstrap';
 
 const ThemeToggle = () => {
   const dispatch = useDispatch();
+  const isPremiumActive = useSelector(state => state.expenses.isPremiumActive);
   const isDarkTheme = useSelector(state => state.theme.isDarkTheme);
+
+   if (!isPremiumActive) return null;
 
   return (
     <Button 

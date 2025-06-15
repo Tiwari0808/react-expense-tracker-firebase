@@ -4,7 +4,7 @@ const initialState = {
   expenses: [],
   totalAmount: 0,
   isPremium: false,
-  isPremiumActive: false 
+  isPremiumActive: false,
 };
 const expenseSlice = createSlice({
   name: "expense",
