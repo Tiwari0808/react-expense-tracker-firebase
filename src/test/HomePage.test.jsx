@@ -57,7 +57,7 @@ describe("testing home page", () => {
         expenses: [{ id: "1", amount: 15000 }],
         totalAmount: 15000,
         isPremium: true,
-        isPremiumActive: true, // 💡 important!
+        isPremiumActive: true,
       },
       auth: { isLoggedIn: true },
       theme: { isDarkTheme: false },

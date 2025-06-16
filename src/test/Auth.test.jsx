@@ -39,9 +39,11 @@ describe("testing Login and signUp page", () => {
     expect(signupbtn).toBeInTheDocument();
     await userEvent.click(signupbtn);
     screen.debug();
-    const signUpHeader = await screen.findByText('Sign Up',{selector:'.card-title'});
+    const signUpHeader = await screen.findByText("Sign Up", {
+      selector: ".card-title",
+    });
     expect(signUpHeader).toBeInTheDocument();
-    const signUpBtn = screen.getByRole('button',{name:'Sign Up'});
+    const signUpBtn = screen.getByRole("button", { name: "Sign Up" });
     expect(signUpBtn).toBeInTheDocument();
   });
 });
