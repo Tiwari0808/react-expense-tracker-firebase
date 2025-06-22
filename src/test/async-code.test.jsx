@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 import store from "../store/store";
 import userEvent from "@testing-library/user-event";
 import { testStore } from "./testutils";
-import { configureStore } from "@reduxjs/toolkit";
 vi.mock("axios");
 vi.fn();
 
@@ -69,6 +68,7 @@ test('activates premium features when clicked', async () => {
       expenses: { isPremium: true, isPremiumActive: false }
     })}>
       <HomePage />
+      <ToastContainer/>
     </Provider>
   );
 

@@ -12,47 +12,47 @@ import {
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../store/expenseSlice";
-import './homepage.css'
-import ThemeToggle from '../components/ThemeToggle';
-
-const Firebase_url =
-  "https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses.json";
+import "./homepage.css";
+import ExpensesChart from "../components/ExpensesChart";
+import { fetchData } from "../store/profileSlice";
+import { getuserIdFromToken } from "../store/utils";
 
 const HomePage = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Food");
-
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const totalAmount = useSelector((state) => state.expenses.totalAmount);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const expenses = useSelector((state) => state.expenses.expenses);
   const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const user_id = getuserIdFromToken(token);
   const isPremium = useSelector((state) => state.expenses.isPremium);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const isPremiumActive = useSelector(state=>state.expenses.isPremiumActive)
-
+  const isPremiumActive = useSelector((state) => state.expenses.isPremiumActive);
+  const Firebase_url = `https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses/${user_id}.json`;
   const downloadExpensesCSV = () => {
     const csvContent = [
-      'Amount,Description,Category,Date',
-      ...expenses.map(exp =>
-        `"${exp.amount}","${exp.description}","${exp.category}","${exp.date}"`
-      )
-    ].join('\n');
+      "Amount,Description,Date",
+      ...expenses.map(
+        (exp) => `"${exp.amount}","${exp.description}","${exp.date}"`
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'expenses.csv';
+    link.download = "expenses.csv";
     link.click();
     URL.revokeObjectURL(url);
   };
 
   const activatePremiumHandler = () => {
     dispatch(expenseActions.activatePremium());
-    toast.success('Premium features activated!')
-  }
-
+    toast.success("Premium features activated!");
+  };
 
   useEffect(() => {
     const getExpenses = async () => {
@@ -64,12 +64,13 @@ const HomePage = () => {
           loadedExpenses.push({ id: key, ...data[key] });
         }
         dispatch(expenseActions.setExpenses(loadedExpenses));
+        dispatch(fetchData(token));
       } catch (error) {
+        console.log(error);
         toast.error("Failed to load expenses");
       }
     };
-    getExpenses()
-
+    getExpenses();
   }, [isLoggedIn, dispatch]);
 
   const editHandler = (expense) => {
@@ -77,7 +78,7 @@ const HomePage = () => {
     setEditId(expense.id);
     setAmount(expense.amount);
     setDescription(expense.description);
-    setCategory(expense.category);
+    setDate(expense.date);
   };
 
   const submitHandler = async (e) => {
@@ -86,7 +87,7 @@ const HomePage = () => {
     const expenseData = {
       amount,
       description,
-      category,
+      date,
     };
 
     try {
@@ -97,10 +98,10 @@ const HomePage = () => {
         );
 
         if (res.status === 200) {
-          toast.success("Expense updated successfully");
           dispatch(
             expenseActions.updateExpense({ id: editId, ...expenseData })
           );
+          toast.success("Expense updated successfully");
           setIsEditing(false);
           setEditId(null);
         }
@@ -108,16 +109,14 @@ const HomePage = () => {
         const res = await axios.post(Firebase_url, expenseData);
         if (res.status === 200) {
           const id = res.data.name; // Firebase returns the new id here
+          dispatch(expenseActions.addExpense({ id: id, ...expenseData }));
           toast.success("Expense added successfully");
-          dispatch(
-            expenseActions.addExpense({ id: res.data.name, ...expenseData })
-          );
         }
       }
 
       setAmount("");
       setDescription("");
-      setCategory("Food");
+      setDate(() => new Date().toISOString().split("T")[0]);
     } catch (error) {
       toast.error("Failed to save Expense");
     }
@@ -129,36 +128,41 @@ const HomePage = () => {
         `https://expense-tracker-2-c797e-default-rtdb.firebaseio.com/expenses/${id}.json`
       );
       if (res.status === 200) {
-        toast.success("Expense deleted Successfully");
         dispatch(expenseActions.deleteExpense(id));
       }
+      toast.success("Expense deleted Successfully");
     } catch (error) {
       toast.error("Something went wrong");
     }
   };
 
   return (
-    <Container>
-      {isPremium && (
-        <div className="premium-features mb-3">
-          <Button variant="success" onClick={activatePremiumHandler}>
-            Activate Premium
-          </Button>
-
-          {isPremiumActive && (
-            <div className="mt-2">
-              <ThemeToggle />
-              <Button variant="info" onClick={downloadExpensesCSV} className="ms-2">
-                Download Expenses
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-      <Row>
-        <Col lg={4}>
-          <Card className="p-3 mt-4">
-            <h4>{isEditing ? "Edit Expense" : "Add Daily Expense"}</h4>
+    <Container id="">
+      <div id="premium">
+        {isPremium && !isPremiumActive && (
+          <>
+            <p>You have unlocked premium features</p>
+            <Button
+              size="sm"
+              variant="success"
+              onClick={activatePremiumHandler}>
+              Activate Premium
+            </Button>
+          </>
+        )}
+      </div>
+      <Row id="row-main">
+        <Col id="chart-col" md={4}>
+          <Card className="p-4" id="chart">
+            <h5>Monthly Expense Summary</h5>
+            <ExpensesChart expenses={expenses} />
+          </Card>
+        </Col>
+        <Col md={3} id="add-expense-col">
+          <Card className="p-3">
+            <h4 id="add-expense-header">
+              {isEditing ? "Edit Expense" : "Add Daily Expense"}
+            </h4>
             <Form onSubmit={submitHandler}>
               <Form.Group className="mb-3" controlId="expenseAmount">
                 <Form.Label>Amount</Form.Label>
@@ -181,62 +185,80 @@ const HomePage = () => {
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="expenseCategory">
-                <Form.Label>Category</Form.Label>
-                <Form.Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}>
-                  <option>Food</option>
-                  <option>Petrol</option>
-                  <option>Salary</option>
-                  <option>Entertainment</option>
-                  <option>Others</option>
-                </Form.Select>
+                <Form.Label>Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                />
               </Form.Group>
-
-              <Button type="submit">
-                {isEditing ? "Update Expense" : "Add Expense"}
-              </Button>
-              {isEditing && (
-                <Button
-                  variant="secondary"
-                  className="ms-2"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditId(null);
-                    setAmount("");
-                    setDescription("");
-                    setCategory("Food");
-                  }}>
-                  Cancel Edit
+              <div id="btns">
+                <Button type="submit" size="sm">
+                  {isEditing ? "Update Expense" : "Add Expense"}
                 </Button>
-              )}
+
+                {isEditing && (
+                  <Button
+                    variant="secondary"
+                    className="ms-2"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditId(null);
+                      setAmount("");
+                      setDescription("");
+                      setDate(() => new Date().toISOString().split("T")[0]);
+                    }}>
+                    Cancel Edit
+                  </Button>
+                )}
+                {isPremiumActive && (
+                  <p id="premium-para">
+                    As a premium user you can download the expenses
+                  </p>
+                )}
+              </div>
             </Form>
           </Card>
         </Col>
 
-        <Col lg={6}>
-          <h5 className="mt-4">Expenses</h5>
+        <Col className="mt-0" md={5}>
+          <div id="expenses_header">
+            <h5 className="mt-4">Expenses</h5>
+            <h5 className="mt-4">Total Expenses:₹{totalAmount}</h5>
+            {isPremiumActive && (
+              <Button size="sm" variant="success" onClick={downloadExpensesCSV}>
+                Download
+              </Button>
+            )}
+          </div>
           {expenses.length === 0 ? (
             <p>No expenses added yet.</p>
           ) : (
-            <ListGroup>
-              {expenses.map((exp) => (
-                <ListGroup.Item key={exp.id}>
-                  ₹{exp.amount} - {exp.description} ({exp.category})
-                  <Button
-                    variant="outline-warning"
-                    className="mx-2"
-                    onClick={() => editHandler(exp)}>
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => deleteHandler(exp.id)}>
-                    Delete
-                  </Button>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
+            <div>
+              <ListGroup>
+                {expenses.map((exp) => (
+                  <ListGroup.Item id="expense-list" key={exp.id}>
+                    ₹{exp.amount} - {exp.description} - {exp.date}
+                    <div id="expense-btns">
+                      <Button
+                        size="sm"
+                        variant="outline-warning"
+                        className="mx-2"
+                        onClick={() => editHandler(exp)}>
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() => deleteHandler(exp.id)}>
+                        Delete
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </div>
           )}
         </Col>
       </Row>

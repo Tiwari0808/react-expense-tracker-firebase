@@ -1,74 +1,58 @@
 import { useRef, useContext, useState, useEffect } from "react";
 import { Button, Card, Container, Form } from "react-bootstrap";
 import { AuthContext } from "../Contexts/Auth-Context";
-import axios from "axios";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-
-const ProfilePage = () => {
+import { useDispatch, useSelector } from "react-redux";
+import { fetchData, updateProfile } from "../store/profileSlice";
+import './profilePage.css'
+const ProfilePage = ({}) => {
   const nameInputRef = useRef();
   const photoInputRef = useRef();
+  const emailRef = useRef();
   const { verifyEmail } = useContext(AuthContext);
-  const token = useSelector(state=>state.auth.token);
+  const token = useSelector((state) => state.auth.token);
+  const [emailInfo, setEmailInfo] = useState("Email not verified! Please verify");
+  const dispatch = useDispatch();
+  const { name, email, photoUrl, emailVerified, loading, error } = useSelector(
+    (state) => state.profile
+  );
 
-  const [emailVerified, setEmailVerified] = useState(false);
+  const verifyEmailHandler = () => {
+    verifyEmail();
+    toast.info("Verification Email Sent");
+  };
+
 
   useEffect(() => {
-    const fetchdata = async () => {
-      try {
-        const res = await axios.post(
-          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4`,
-          {
-            idToken: token,
-          }
-        );
-
-        if (res.data.users && res.data.users.length > 0) {
-          const user = res.data.users[0];
-          if (user.displayName) nameInputRef.current.value = user.displayName;
-          if (user.photoUrl) photoInputRef.current.value = user.photoUrl;
-          setEmailVerified(user.emailVerified);
-          toast.success('Previous Data fetched Successfully')
-        } else {
-         toast.error('Could not fetch profile data');
-        }
-      } catch (error) {
-        console.error("Error fetching Profie", error.message);
-      }
-    };
     if (token) {
-      fetchdata();
+      dispatch(fetchData(token));
     }
-  }, [token]);
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    if (nameInputRef.current && name) {
+      nameInputRef.current.value = name;
+    }
+    if (photoInputRef.current && photoUrl) {
+      photoInputRef.current.value = photoUrl;
+    }
+  }, [name, photoUrl]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     const enteredName = nameInputRef.current.value;
     const enteredPhoto = photoInputRef.current.value;
 
-    const response = await fetch(
-      "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          idToken: token,
-          displayName: enteredName,
-          photoUrl: enteredPhoto,
-          returnSecureToken: true,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const data = await response.json();
-    if (response.ok) {
-      toast.success('Profile updated successfully!')
-    } else {
-      let errMsg = data.error.message ;
-      toast.success(errMsg || 'Error submitting data');
-    }
+    dispatch(
+      updateProfile({ name: enteredName, token, photoUrl: enteredPhoto })
+    )
+      .unwrap()
+      .then(() => {
+        toast.success("Profile updated successfully!");
+      })
+      .catch((err) => {
+        toast.error(err || "Failed to update profile");
+      });
   };
 
   return (
@@ -76,6 +60,7 @@ const ProfilePage = () => {
       <Card>
         <Card.Body>
           <Card.Title>Complete Your Profile</Card.Title>
+          <img id="profileImg" src={`${photoUrl}`} alt="Profile Image" />
           <Form onSubmit={submitHandler}>
             <Form.Group>
               <Form.Label>Full Name</Form.Label>
@@ -85,8 +70,15 @@ const ProfilePage = () => {
               <Form.Label>Profile Photo URL</Form.Label>
               <Form.Control type="text" ref={photoInputRef} required />
             </Form.Group>
+            {!emailVerified && <p className="text-danger">{emailInfo}</p>}
+            
+            {emailVerified ? 
+              
+              <p className="text-success">Your Email is {email} . Email Verified</p>
+              : <p className="text-danger">Your Email {email} not verified! Verify now</p>
+            }
             {!emailVerified && (
-              <Button variant="warning" onClick={() => verifyEmail()}>
+              <Button variant="warning" onClick={() => verifyEmailHandler()}>
                 Verify Email
               </Button>
             )}

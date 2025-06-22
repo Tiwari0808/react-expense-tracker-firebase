@@ -1,22 +1,25 @@
 import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 export const AuthContext = createContext();
 
 const AuthContextProvider = ({ children }) => {
   const token = useSelector((state) => state.auth.token);
+  const api_key = import.meta.env.VITE_FIREBASE_API_KEY;
 
   const verifyEmail = async () => {
     try {
       const res = await axios.post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4",
+       `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${api_key}`,
         {
           requestType: "VERIFY_EMAIL",
           idToken: token,
         }
       );
-      alert("Verification email sent.Please check your inbox.");
+      
+      toast.success("Verification email sent.Please check your inbox.");
     } catch (error) {
       const errMsg =
         error?.response?.data?.error?.message ||
@@ -27,8 +30,7 @@ const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{verifyEmail }}>
+    <AuthContext.Provider value={{ verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

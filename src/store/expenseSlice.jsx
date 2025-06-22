@@ -6,6 +6,7 @@ const initialState = {
   isPremium: false,
   isPremiumActive: false,
 };
+
 const expenseSlice = createSlice({
   name: "expense",
   initialState: initialState,
@@ -15,18 +16,19 @@ const expenseSlice = createSlice({
     },
     addExpense(state, action) {
       state.expenses.push(action.payload),
-        (state.totalAmount += Number(action.payload.amount)),
-        (state.isPremium = state.totalAmount > 10000);
+      state.totalAmount += Number(action.payload.amount),
+      state.isPremium = state.totalAmount > 10000;
     },
     updateExpense(state, action) {
       const index = state.expenses.findIndex(
         (exp) => exp.id === action.payload.id
       );
+      
       if (index !== -1) {
         state.totalAmount -= Number(state.expenses[index].amount);
         state.expenses[index] = action.payload;
-        (state.totalAmount += Number(action.payload.amount)),
-          (state.isPremium = state.totalAmount > 10000);
+        state.totalAmount += Number(action.payload.amount),
+        state.isPremium = state.totalAmount > 10000;
       }
     },
     deleteExpense(state, action) {
@@ -46,6 +48,7 @@ const expenseSlice = createSlice({
         0
       );
       state.isPremium = state.totalAmount > 10000;
+      
     },
   },
 });

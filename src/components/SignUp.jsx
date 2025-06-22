@@ -12,6 +12,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../store/authSlice";
+import { toast } from "react-toastify";
+import './signup.css'
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -27,7 +29,6 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
- 
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -42,12 +43,11 @@ const SignUp = () => {
 
     setIsLoading(true);
     let url;
+    const api_key = import.meta.env.VITE_FIREBASE_API_KEY;
     if (isLogin) {
-      url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4";
+      url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${api_key}`
     } else {
-      url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCakUs_qV484dbihixd259CT1ao8wOIIh4";
+      url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${api_key}`
     }
     try {
       const res = await fetch(url, {
@@ -60,6 +60,7 @@ const SignUp = () => {
       });
       setIsLoading(false);
       const data = await res.json();
+      
 
       if (!res.ok) {
         setErrMsg(data.error.message || "Error Occured");
@@ -67,6 +68,7 @@ const SignUp = () => {
       } else {
         dispatch(authActions.login(data.idToken));
         navigate("/");
+        toast.success("Logged in Successfully");
         setSuccessMsg(isLogin ? "Login Successful!" : "Sign Up Successful!");
         emailInputRef.current.value = "";
         passwordInputRef.current.value = "";
@@ -88,7 +90,7 @@ const SignUp = () => {
   return (
     <Container className="mt-5">
       <Row>
-        <Col lg={6}>
+        <Col lg={4}>
           <Card>
             <Card.Body>
               <Card.Title>{isLogin ? "Login" : "Sign Up"}</Card.Title>
@@ -121,12 +123,16 @@ const SignUp = () => {
                       required></Form.Control>
                   </Form.Group>
                 )}
-                {!isLoading && (
-                  <Button className="mt-3" type="submit">
+                {!isLoading ? (
+                  <Button className="mt-3 p-2" type="submit">
+                    {isLogin ? "Login" : "Sign Up"}
+                  </Button>
+                ) : (
+                  <Button className="mt-3 p-2" type="submit" disabled={isLoading}>
+                     <Spinner className="mx-2" animation="border" size="sm"/>
                     {isLogin ? "Login" : "Sign Up"}
                   </Button>
                 )}
-                {isLoading && <Spinner animation="grow"></Spinner>}
                 <br></br>
                 {isLogin && (
                   <a

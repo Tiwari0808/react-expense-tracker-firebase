@@ -1,0 +1,38 @@
+span.navbar-brand {
+    display: flex;
+    width: 25%;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+}
+svg#brand-icon {
+    color: darkgreen;
+    font-size: x-large;
+}
+.second-nav.navbar-nav {
+    width: -webkit-fill-available;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: large;
+    font-weight: 400;
+}
+div#user {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 10px;
+    gap: 10px;
+    font-weight: 200;
+    cursor: pointer;
+}
+
+#theme-icon{
+    cursor: pointer;
+}
+
+img#navProfileImg {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 100%;
+}

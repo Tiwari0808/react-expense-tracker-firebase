@@ -31,3 +31,70 @@
 .dark-theme .premium-features {
   background-color: #2d2d2d;
 }
+
+.dark-theme {
+  transition: background-color 0.3s ease;
+}
+
+#expenses_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+div#premium {
+  display: flex;
+  align-items: center;
+  justify-content: normal;
+  gap: 1rem;
+  padding: 10px;
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+div#btns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+p#premium-para {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.45rem;
+  color: slategrey;
+}
+
+div#expense-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+h5 {
+  font-size: 0.7rem;
+}
+
+div#expense-btns {
+  display: flex;
+  justify-content: flex-end;
+}
+
+button#show-Expense-Btn {
+  width: auto;
+}
+
+h4#add-expense-header {
+  font-size: 1rem;
+}
+
+div#add-expense-col {
+  font-size: 0.5rem;
+}
