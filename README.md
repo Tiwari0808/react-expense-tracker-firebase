@@ -1,41 +1,134 @@
-# 💸 React Expense Tracker with Firebase Authentication
+# 💰 Expense Tracker App
 
-A fully functional **Expense Tracker** application built using **React** and **Firebase**. It allows users to sign up, log in, manage their expenses, update profile details, and verify email addresses — all while keeping the UI clean and responsive with **React Bootstrap**.
+An advanced, user-friendly **Expense Tracker** built with **React**, **Redux Toolkit**, and **Firebase Realtime Database**. This application allows users to manage daily expenses, activate premium features like **CSV download**, visualize data through **interactive charts**, and toggle between **light/dark themes**.
+
+🔗 **Live Site**: [https://expense-tracker-2-c797e.web.app](https://expense-tracker-2-c797e.web.app)
 
 ---
 
 ## 🚀 Features
 
-- 🔐 User Authentication (Firebase)
-- 🧾 Add, view, and manage expenses
-- 👤 Profile update (display name & profile photo)
-- 📧 Email verification
-- 📦 Persisted authentication state using `localStorage`
-- 🎨 Styled with React Bootstrap
-- 📂 Clean project structure with modular components
+- ✅ **Authentication**
+  - User sign up, login, logout using Firebase Auth
+  - Email verification check
+  - Token validation and auto-logout on manipulation
+
+- 📊 **Expense Management**
+  - Add, edit, delete daily expenses
+  - Store securely in Firebase
+  - Calculate and display total expenses
+
+- ⭐ **Premium Features**
+  - Activate premium mode after threshold
+  - Download expenses as CSV
+  - Interactive **Chart.js** visualizations
+
+- 🌙 **Dark / Light Theme**
+  - Toggle switch to change app appearance
+  - Custom dark mode styling with CSS
+
+- 🔐 **Security**
+  - Auto logout if local token is tampered
+  - Uses `useEffect + setInterval` for token integrity check
 
 ---
 
-## 🔧 Tech Stack
+## 🛠 Tech Stack
 
-- **Frontend**: React, React Bootstrap
-- **Backend**: Firebase Authentication (REST API)
-- **State Management**: React Context API
-- **HTTP Requests**: Axios & Fetch API
+| Tech            | Usage                                     |
+|-----------------|-------------------------------------------|
+| React           | Frontend framework                        |
+| Redux Toolkit   | Global state management                   |
+| Firebase        | Auth + Realtime Database + Hosting        |
+| Chart.js        | Expense visualization                     |
+| React-Bootstrap | UI components                             |
+| Vite            | Fast build and dev environment            |
+| Toastify        | Success/error notifications               |
 
 ---
 
-## 📸 Screenshots
+## 📁 Project Structure
 
-Coming soon...
+├── public/
+├── src/
+│ ├── components/
+│ │ ├── MainNavbar.jsx
+│ │ ├── ExpensesChart.jsx
+│ │ └── ...
+│ ├── pages/
+│ │ ├── HomePage.jsx
+│ │ ├── ProfilePage.jsx
+│ │ └── ...
+│ ├── store/
+│ │ ├── authSlice.jsx
+│ │ ├── expenseSlice.jsx
+│ │ └── ...
+│ ├── Contexts/
+│ │ └── Auth-Context.jsx
+│ └── main.jsx
+├── firebase.json
+├── vite.config.js
+└── README.md
 
 ---
 
-## 🛠️ Getting Started
+## 📦 Getting Started (Local Setup)
 
-### 1. Clone the Repository
+1. **Clone the Repo**
+   ```bash
+   git clone https://github.com/your-username/expense-tracker-2.git
+   cd expense-tracker-2
+Install Dependencies
 
-```bash
-git clone https://github.com/YOUR_USERNAME/react-expense-tracker-firebase.git
-cd react-expense-tracker-firebase
+bash
+Copy
+Edit
+npm install
+Run Locally
+
+bash
+Copy
+Edit
+npm run dev
+Build for Production
+
+bash
+Copy
+Edit
+npm run build
+🔥 Deployment
+Hosting: Firebase Hosting
+
+Build output: dist/
+
+Deploy with:
+
+bash
+Copy
+Edit
+firebase deploy
+
+🙌 Author
+Divyanshu Tiwari
+Frontend Developer | Firebase Enthusiast
+GitHub: @Tiwari0808
+
+📃 License
+This project is licensed under the MIT License - feel free to use and modify.
+
+yaml
+Copy
+Edit
+
+---
+
+### ✅ How to Use It
+
+1. Copy the above into a new file: `README.md` in your project root.
+2. Replace `"your-username"` in the GitHub clone URL with your actual GitHub username.
+3. Update the **Todo** section as you improve the project.
+
+
+
+
 
